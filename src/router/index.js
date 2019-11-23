@@ -104,6 +104,42 @@ export const constantRoutes = [
     ]
   },
 
+  {
+    path: '/news',
+    component: Layout,
+    redirect: '/news/list',
+    children: [{
+        path: 'list',
+        name: 'news',
+        component: () => import('@/views/news/news'),
+        meta: { title: '品牌文化', icon: 'form' },
+      }]
+  },
+
+  {
+    path: '/videos',
+    component: Layout,
+    redirect: '/videos/list',
+    children: [{
+        path: 'list',
+        name: 'videos',
+        component: () => import('@/views/videos/videos'),
+        meta: { title: '品牌视频', icon: 'form' },
+      }]
+  },
+
+  {
+    path: '/retail',
+    component: Layout,
+    redirect: '/retail/index',
+    children: [{
+        path: 'index',
+        name: 'retail',
+        component: () => import('@/views/retail/retail'),
+        meta: { title: '营销配置', icon: 'form' },
+      }]
+  },
+
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]
