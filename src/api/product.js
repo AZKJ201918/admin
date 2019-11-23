@@ -42,3 +42,13 @@ export function updateProduct(data) {
     })
 }
 
+/**
+ * 删除商品轮播图
+ */
+export function deleteDetailBanner(id) {
+    return testRequest({
+        url: '/deleteDetailBanner',
+        method: 'post',
+        params: {id}
+    })
+}
