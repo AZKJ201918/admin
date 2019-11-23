@@ -1,6 +1,6 @@
 <template>
   <div class="com-image-drag">
-    <div class="button-list">
+    <div class="button-list" v-if="limit > 1">
       <el-button
         @click="openDrag"
         v-if="!drag_open"
@@ -63,10 +63,12 @@
           </div>
         </div>
         <el-upload
+          v-show="banner_list.length< limit"
           list-type="picture-card"
           name="file"
           class="upload-machine"
           :disabled="drag_open"
+          :headers="{'X-token': getToken()}"
           :action="action()"
           :on-error="onError"
           :on-success="onSuccess"
@@ -94,6 +96,7 @@
  * @param {Function} onError 上传失败的回调函数
  */
 import draggable from "vuedraggable";
+import { getToken } from "@/utils/auth";
 export default {
   name: "ComImageShow",
   components: {
@@ -132,6 +135,7 @@ export default {
     };
   },
   methods: {
+    getToken,
     updateToFather() {
       this.$emit("update:list", this.banner_list.map(item => item.url));
     },
