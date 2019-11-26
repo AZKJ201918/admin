@@ -8,7 +8,7 @@
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button type="primary" @click="showEdit(scope.row)">修改</el-button>
-          <el-button type="danger" @click="deleteNew(scope.row.id)">删除</el-button>
+          <el-button type="danger" @click="deleteNew(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -112,14 +112,14 @@ export default {
         });
       }
     },
-    deleteNew(id) {
+    deleteNew(row) {
       this.$confirm("此操作将永久删除此文章, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
         .then(() => {
-          deleteNew(id).then(() => {
+          deleteNew({id: row.id, uid: row.uid}).then(() => {
             this.$message({
               type: "success",
               message: "删除成功!"

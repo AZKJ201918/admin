@@ -86,7 +86,7 @@ export const constantRoutes = [
         path: 'list',
         name: 'productList',
         component: () => import('@/views/product/list'),
-        meta: { title: '所有商品', icon: 'form' },
+        meta: { title: '所有商品', icon: 'form' }
       },
       {
         path: 'info',
@@ -105,15 +105,27 @@ export const constantRoutes = [
   },
 
   {
+    path: '/order',
+    component: Layout,
+    redirect: '/order/index',
+    children: [{
+      path: 'index',
+      name: 'order',
+      component: () => import('@/views/order/index'),
+      meta: { title: '订单管理', icon: 'form' }
+    }]
+  },
+
+  {
     path: '/news',
     component: Layout,
     redirect: '/news/list',
     children: [{
-        path: 'list',
-        name: 'news',
-        component: () => import('@/views/news/news'),
-        meta: { title: '品牌文化', icon: 'form' },
-      }]
+      path: 'list',
+      name: 'news',
+      component: () => import('@/views/news/news'),
+      meta: { title: '品牌文化', icon: 'form' }
+    }]
   },
 
   {
@@ -121,11 +133,11 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/videos/list',
     children: [{
-        path: 'list',
-        name: 'videos',
-        component: () => import('@/views/videos/videos'),
-        meta: { title: '品牌视频', icon: 'form' },
-      }]
+      path: 'list',
+      name: 'videos',
+      component: () => import('@/views/videos/videos'),
+      meta: { title: '品牌视频', icon: 'form' }
+    }]
   },
 
   {
@@ -133,11 +145,23 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/retail/index',
     children: [{
-        path: 'index',
-        name: 'retail',
-        component: () => import('@/views/retail/retail'),
-        meta: { title: '营销配置', icon: 'form' },
-      }]
+      path: 'index',
+      name: 'retail',
+      component: () => import('@/views/retail/retail'),
+      meta: { title: '营销配置', icon: 'form' }
+    }]
+  },
+
+  {
+    path: '/user',
+    component: Layout,
+    redirect: '/user/index',
+    children: [{
+      path: 'index',
+      name: 'user',
+      component: () => import('@/views/user/index'),
+      meta: { title: '账号设置', icon: 'form' }
+    }]
   },
 
   // 404 page must be placed at the end !!!

@@ -35,7 +35,7 @@
             </div>
           </el-form-item>
           <el-form-item label="商品轮播">
-            <drawable-upload :limit="3" :list.sync="uploadList.banner"></drawable-upload>
+            <drawable-upload :limit="10" :list.sync="uploadList.banner"></drawable-upload>
           </el-form-item>
         </el-form>
       </el-card>
@@ -51,37 +51,11 @@
         <sale-setting v-model="currentProduct.commercial"></sale-setting>
       </el-card>
       <el-card class="card-box" ref="agency">
-        <el-form class="agency-form" ref="form" :model="currentProduct" label-width="120px">
-          <el-form-item label="独立分销">
-            <el-checkbox v-model="currentProduct.retail">是否为此商品开启独立分销</el-checkbox>
-          </el-form-item>
-          <el-collapse-transition>
-            <div v-show="currentProduct.retail">
-              <el-form-item label="第一级分销模式">
-                <el-radio v-model="currentProduct.retailTable.parenttype" :label="0">比例分销</el-radio>
-                <el-radio v-model="currentProduct.retailTable.parenttype" :label="1">固定金额</el-radio>
-              </el-form-item>
-              <el-form-item
-                :label="currentProduct.retailTable.parenttype === 0? '第一级分销比例':'第一级分销金额' "
-              >
-                <el-input v-model="currentProduct.retailTable.parent"></el-input>
-              </el-form-item>
-              <el-form-item label="第二级分销模式">
-                <el-radio v-model="currentProduct.retailTable.grandtype" :label="0">比例分销</el-radio>
-                <el-radio v-model="currentProduct.retailTable.grandtype" :label="1">固定金额</el-radio>
-              </el-form-item>
-              <el-form-item
-                :label="currentProduct.retailTable.grandtype === 0? '第一级分销比例':'第一级分销金额'"
-              >
-                <el-input v-model="currentProduct.retailTable.grand"></el-input>
-              </el-form-item>
-              <div style="font-size: 14px;color: #606266;">
-                独立分销结束时间
-                <el-date-picker v-model="currentProduct.retailTable.outtime" type="datetime"></el-date-picker>
-              </div>
-            </div>
-          </el-collapse-transition>
-        </el-form>
+        <retail-setting
+          :ready.sync="ready"
+          :retail.sync="currentProduct.retail"
+          :retailTable.sync="currentProduct.retailTable"
+        ></retail-setting>
       </el-card>
       <el-card class="card-box" ref="detail">
         <el-form ref="form" :model="currentProduct" label-width="80px">
@@ -121,12 +95,14 @@
 import saleSetting from "@/components/product/sale-setting";
 import retailSetting from "@/components/product/retail-setting";
 import DrawableUpload from "@/components/DrawableUpload";
-import { updateProduct } from "@/api/product";
+import { updateProduct, deleteDetailBanner } from "@/api/product";
+import { setTimeout } from "timers";
 const names = ["base", "repertory", "sale", "agency", "detail", "freight"];
 export default {
-  components: { saleSetting, DrawableUpload },
+  components: { saleSetting, retailSetting, DrawableUpload },
   data() {
     return {
+      ready: true,
       interval: null,
       currentProduct: null,
       activeName: "base",
@@ -173,7 +149,7 @@ export default {
     }
     //分销属性的初始化
     this.currentProduct.retail = !!this.currentProduct.retail;
-    if (!this.currentProduct.retail) {
+    if (!("retailTable" in this.currentProduct)) {
       this.currentProduct.retailTable = {
         cid: this.currentProduct.id,
         grand: 0,
@@ -240,7 +216,7 @@ export default {
       }, 1);
     },
     /**
-     * 监听页面滚动时间
+     * 监听页面滚动事件
      */
     watchScroll() {
       let scroll = document.documentElement.scrollTop;
@@ -256,38 +232,37 @@ export default {
         }
       }
     },
-    save() {
-      const product = JSON.parse(JSON.stringify(this.currentProduct));
-      //对库存进行操作
-      if (this.originalRepertory === product.repertory) {
-        product.repertory = 0;
-      } else {
-        product.repertory = product.repertory - this.originalRepertory;
-      }
-      //详情图
-      product.detailurl = JSON.stringify(this.uploadList.detail);
-      product.saleurl = JSON.stringify(this.uploadList.sale);
-      product.specsurl = JSON.stringify(this.uploadList.specs);
-      product.deatilBannerList.splice(
-      this.uploadList.banner.length,
-        product.deatilBannerList.length - this.uploadList.banner.length
-      );
-      this.uploadList.banner.forEach((element, index) => {
-        if (index < product.deatilBannerList.length) {
-          product.deatilBannerList[index].detailurl = element;
-          product.deatilBannerList[index].sort = index + 1;
+    async save() {
+      if (this.ready) {
+        const product = JSON.parse(JSON.stringify(this.currentProduct));
+        //对库存进行操作
+        if (this.originalRepertory === product.repertory) {
+          product.repertory = 0;
         } else {
+          product.repertory = product.repertory - this.originalRepertory;
+        }
+        //详情图
+        product.detailurl = JSON.stringify(this.uploadList.detail);
+        product.saleurl = JSON.stringify(this.uploadList.sale);
+        product.specsurl = JSON.stringify(this.uploadList.specs);
+
+        //轮播图
+        await deleteDetailBanner(product.id);
+        product.deatilBannerList = [];
+        this.uploadList.banner.forEach((element, index) => {
           product.deatilBannerList[index] = {
             cid: product.id,
             detailurl: element,
             sort: index + 1
           };
-        }
-      });
-      //上传
-      updateProduct(product).then(_ => {
-        this.$router.back(-1);
-      });
+        });
+        //上传
+        updateProduct(product).then(_ => {
+          this.$router.back(-1);
+        });
+      } else {
+        this.$message({ message: "参数不合法" });
+      }
     }
   },
   destroyed() {
@@ -305,7 +280,7 @@ export default {
   top: 50px;
   width: 100%;
   background-color: #ffffff;
-  z-index: 1;
+  z-index: 2;
   padding-left: 20px;
 }
 .integral {

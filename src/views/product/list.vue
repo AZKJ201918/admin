@@ -33,7 +33,6 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <!-- 不处于标记状态，或选中不是此行时显示此按钮 -->
           <el-button
             type="primary"
             @click="edit(scope.row)"

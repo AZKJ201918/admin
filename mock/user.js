@@ -26,11 +26,10 @@ const users = {
 export default [
   // user login
   {
-    url: '/user/login',
+    url: 'login',
     type: 'post',
     response: config => {
-      const { username } = config.body
-      const token = tokens[username]
+      const token = tokens['admin-token']
 
       // mock error
       if (!token) {
@@ -52,7 +51,6 @@ export default [
     url: '/user/info\.*',
     type: 'get',
     response: config => {
-      const { token } = config.query
       const info = users['editor-token']
 
       // mock error
