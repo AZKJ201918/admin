@@ -51,6 +51,10 @@ export default {
   },
   created() {
     getCensus().then(({ data }) => {
+      //先对查询结果排序
+      data.sort((a, b) => {
+        return a.click_date - b.click_date;
+      });
       data.forEach(({ money, num, click_date }) => {
         //销售量
         const dateStr = this.dateFomate(click_date);
@@ -59,7 +63,11 @@ export default {
         this.dataPushtoChart("money", dateStr, money);
       });
     });
-    getVisitAndRegister().then(({data}) => {
+    getVisitAndRegister().then(({ data }) => {
+      //先对查询结果排序
+      data.sort((a, b) => {
+        return a.click_date - b.click_date;
+      });
       data.forEach(({ visit, register, click_date }) => {
         const dateStr = this.dateFomate(click_date);
         //访问量
@@ -68,9 +76,9 @@ export default {
         this.dataPushtoChart("register", dateStr, register);
       });
     });
-    this.xData = this.chartData.sales.xData;
-    this.yData = this.chartData.sales.yData;
-    this.yName = this.chartData.sales.yName;
+    this.xData = this.chartData.register.xData;
+    this.yData = this.chartData.register.yData;
+    this.yName = this.chartData.register.yName;
   },
   methods: {
     fetchData() {},
@@ -82,13 +90,16 @@ export default {
       this.chartData[name].yData.push(yData);
     },
     dateFomate(click_date) {
+      console.log(click_date);
       const date = new Date(click_date);
+      console.log(date.getTime());
+      console.log(date);
       let dateStr =
         date.getFullYear() +
         "年" +
-        date.getMonth() +
+        (date.getMonth() + 1) +
         "月" +
-        date.getDay() +
+        date.getDate() +
         "日";
       return dateStr;
     },

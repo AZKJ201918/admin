@@ -31,23 +31,46 @@
           <span>{{scope.row.repertory}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="销量" width="80">
+        <template slot-scope="scope">
+          <span>{{scope.row.sales}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="状态">
         <template slot-scope="scope">
           <el-button
-            type="primary"
-            @click="edit(scope.row)"
-            icon="el-icon-edit"
-            circle
-          ></el-button>
-          <el-button type="danger" icon="el-icon-delete" circle></el-button>
+            size="mini"
+            :disabled="!!scope.row.status"
+            type="text"
+            @click="putaway(scope.row)"
+          >上架</el-button>
+          <el-button
+            size="mini"
+            :disabled="!scope.row.status"
+            type="text"
+            @click="soldOut(scope.row)"
+          >下架</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作">
+        <template slot-scope="scope">
+          <el-button type="primary" size="mini" @click="edit(scope.row)">编辑</el-button>
+          <el-button type="danger" size="mini" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination
+      layout="prev, pager, next"
+      hide-on-single-page
+      :current-page.sync="currentPage"
+      :page-count="totalPage"
+      @current-change="fetchData"
+    ></el-pagination>
   </div>
 </template>
 
 <script>
-import { getAllProducts } from "@/api/product";
+import { getAllProducts, deleteProduct, updateProduct } from "@/api/product";
 export default {
   data() {
     return {
@@ -57,11 +80,18 @@ export default {
       saleSettingShow: false,
       retailSettingShow: false,
       editing: false,
-      currentProduct: null
+      currentProduct: null,
+      currentPage: 1,
+      totalPage: 1
     };
   },
   created() {
     this.fetchData();
+  },
+  watch: {
+    $route() {
+      console.log("路由信息改变");
+    }
   },
   computed: {},
   methods: {
@@ -71,9 +101,11 @@ export default {
      */
     fetchData() {
       this.productListLoading = true;
-      getAllProducts(this.productSearchName)
+      getAllProducts(this.productSearchName, this.currentPage)
         .then(({ data }) => {
           this.productList = data.list;
+          this.currentPage = data.pageNum;
+          this.totalPage = data.pages;
         })
         .finally(() => {
           this.productListLoading = false;
@@ -82,11 +114,53 @@ export default {
     edit(row) {
       this.editing = true;
       this.$router.push({
-        name: 'productInfo',
+        name: "productInfo",
         params: {
           product: row
         }
+      });
+    },
+    /**
+     * 下架商品
+     */
+    soldOut(row) {
+      let obj = JSON.parse(JSON.stringify(row));
+      obj.status = 0;
+      updateProduct(obj).then(_ => {
+        this.fetchData();
+      });
+    },
+    /**
+     * 上架商品
+     */
+    putaway(row) {
+      let obj = JSON.parse(JSON.stringify(row));
+      obj.status = 1;
+      updateProduct(obj).then(_ => {
+        this.fetchData();
+      });
+    },
+    deleteHandle(id) {
+      this.$confirm("此操作将永久删除此商品, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
       })
+        .then(() => {
+          deleteProduct(id).then(() => {
+            this.$message({
+              type: "success",
+              message: "删除成功!"
+            });
+            this.fetchData();
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     }
   }
 };

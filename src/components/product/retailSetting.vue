@@ -41,9 +41,6 @@ export default {
   props: ["retail", "retailTable", "ready"],
   data() {
     const validateParent = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error("不能为空"));
-      }
       if (!Number.isInteger(value)) {
         callback(new Error("请输入数字值"));
       } else {
@@ -55,9 +52,6 @@ export default {
       }
     };
     const validateGrand = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error("不能为空"));
-      }
       if (!Number.isInteger(value)) {
         callback(new Error("请输入数字值"));
       } else {

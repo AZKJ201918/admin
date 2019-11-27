@@ -12,32 +12,12 @@
     </div>
     <div class="app-container">
       <el-card class="card-box" ref="base">
-        <el-form ref="form" :model="currentProduct" label-width="80px">
-          <el-form-item label="商品ID">
-            <el-input v-model="currentProduct.id" :disabled="true"></el-input>
-          </el-form-item>
-          <el-form-item label="商品名称">
-            <el-input v-model="currentProduct.name"></el-input>
-          </el-form-item>
-          <el-form-item label="副标题">
-            <el-input v-model="currentProduct.subname"></el-input>
-          </el-form-item>
-          <el-form-item label="商品原价">
-            <el-input v-model="currentProduct.price"></el-input>
-          </el-form-item>
-          <el-form-item label="积分选项">
-            <div class="integral">
-              <el-checkbox v-model="currentProduct.isintegral">此商品为积分商品</el-checkbox>
-              <div v-if="currentProduct.isintegral" style="display: flex">
-                <div style="width: 80px">需要积分</div>
-                <el-input v-model="currentProduct.integralCommodity.integral"></el-input>
-              </div>
-            </div>
-          </el-form-item>
-          <el-form-item label="商品轮播">
-            <drawable-upload :limit="10" :list.sync="uploadList.banner"></drawable-upload>
-          </el-form-item>
-        </el-form>
+        <base-setting
+          v-model="currentProduct"
+          :url.sync="uploadList.url"
+          :banner.sync="uploadList.banner"
+          :integral.sync="currentProduct.integralCommodity.integral"
+        ></base-setting>
       </el-card>
       <el-card class="card-box" ref="repertory">
         <el-form ref="form" :model="currentProduct" label-width="80px">
@@ -73,10 +53,11 @@
       </el-card>
       <el-card class="card-box" ref="freight">
         <el-form ref="form" :model="currentProduct" label-width="80px">
-          <el-form-item label="商品库存"></el-form-item>
+          <el-form-item label="邮费">
+            <el-input v-model="currentProduct.postage"></el-input>
+          </el-form-item>
         </el-form>
       </el-card>
-
       <div class="bottom-button">
         <el-button type="primary" :loading="uploading" @click="save">保存商品配置</el-button>
       </div>
@@ -92,14 +73,66 @@
 </template>
 
 <script>
-import saleSetting from "@/components/product/sale-setting";
-import retailSetting from "@/components/product/retail-setting";
+import baseSetting from "@/components/product/baseSetting";
+import saleSetting from "@/components/product/saleSetting";
+import retailSetting from "@/components/product/retailSetting";
 import DrawableUpload from "@/components/DrawableUpload";
-import { updateProduct, deleteDetailBanner } from "@/api/product";
+import {
+  updateProduct,
+  deleteDetailBanner,
+  insertProduct,
+  deleteProduct
+} from "@/api/product";
 import { setTimeout } from "timers";
+import { type } from "os";
 const names = ["base", "repertory", "sale", "agency", "detail", "freight"];
+function createProductObj(cid) {
+  return {
+    beretail: false,
+    commercial: {
+      aid: "",
+      cid,
+      discount: null,
+      endtime: new Date(),
+      fulld: null,
+      fulldiscount: null,
+      fulls: null,
+      fullsubtract: null,
+      postage: null,
+      starttime: new Date(),
+      subtract: null
+    },
+    deatilBannerList: [],
+    detailurl: "[]",
+    isintegral: false,
+    name: null,
+    price: null,
+    repertory: null,
+    retail: false,
+    retailTable: {
+      cid,
+      grand: 0,
+      grandtype: 9,
+      outtime: new Date(),
+      parent: 0,
+      parenttype: 0
+    },
+    saleurl: "[]",
+    specsurl: "[]",
+    status: 1,
+    subname: null,
+    type: 1,
+    url: null,
+    addRepertory: 0,
+    integralCommodity: {
+      cid,
+      integral: 0,
+      num: 1
+    }
+  };
+}
 export default {
-  components: { saleSetting, retailSetting, DrawableUpload },
+  components: { saleSetting, retailSetting, baseSetting, DrawableUpload },
   data() {
     return {
       ready: true,
@@ -119,7 +152,8 @@ export default {
         detail: [],
         sale: [],
         specs: [],
-        banner: []
+        banner: [],
+        url: []
       },
       detail: [],
       uploading: false,
@@ -134,8 +168,13 @@ export default {
       this.reloadCardScrollTop();
       window.addEventListener("scroll", this.watchScroll);
     });
-    const product = this.$route.params.product;
-    this.currentProduct = this.$route.params.product;
+    let product = null;
+    if ("product" in this.$route.params) {
+      product = this.$route.params.product;
+    } else {
+      product = createProductObj(null);
+    }
+    this.currentProduct = product;
     this.currentProduct.addRepertory = 0;
     this.originalRepertory = this.currentProduct.repertory;
     // 积分属性的的初始化
@@ -147,7 +186,25 @@ export default {
         num: 1
       };
     }
+    if (!("commercial" in this.currentProduct)) {
+      //活动属性初始化
+      this.currentProduct.commercial = {
+        aid: "",
+        cid: this.currentProduct.id,
+        discount: null,
+        endtime: new Date(),
+        fulld: null,
+        fulldiscount: null,
+        fulls: null,
+        fullsubtract: null,
+        postage: null,
+        starttime: new Date(),
+        subtract: null
+      };
+    }
+
     //分销属性的初始化
+    this.currentProduct.beretail = !!this.currentProduct.beretail;
     this.currentProduct.retail = !!this.currentProduct.retail;
     if (!("retailTable" in this.currentProduct)) {
       this.currentProduct.retailTable = {
@@ -171,6 +228,9 @@ export default {
     product.deatilBannerList.forEach(element => {
       this.uploadList.banner.push(element.detailurl);
     });
+    if (product.url) {
+      this.uploadList.url.push(product.url);
+    }
   },
 
   methods: {
@@ -245,9 +305,9 @@ export default {
         product.detailurl = JSON.stringify(this.uploadList.detail);
         product.saleurl = JSON.stringify(this.uploadList.sale);
         product.specsurl = JSON.stringify(this.uploadList.specs);
-
+        //缩略图
+        product.url = this.uploadList.url[0];
         //轮播图
-        await deleteDetailBanner(product.id);
         product.deatilBannerList = [];
         this.uploadList.banner.forEach((element, index) => {
           product.deatilBannerList[index] = {
@@ -256,10 +316,23 @@ export default {
             sort: index + 1
           };
         });
-        //上传
-        updateProduct(product).then(_ => {
-          this.$router.back(-1);
-        });
+        try {
+          this.uploading = true;
+          if ("id" in product) {
+            //更新操作，先删除轮播图
+            await deleteDetailBanner(product.id);
+            await updateProduct(product);
+          } else {
+            //新增
+            await insertProduct(product);
+          }
+          // 回退页面
+          this.$router.push({ name: "productList" });
+        } catch (e) {
+          this.$message({ message: "操作失败:" + e.message, type: "error" });
+        } finally {
+          this.uploading = false;
+        }
       } else {
         this.$message({ message: "参数不合法" });
       }
@@ -277,6 +350,7 @@ export default {
 }
 .tabs {
   position: fixed;
+  transform: translateZ(0);
   top: 50px;
   width: 100%;
   background-color: #ffffff;

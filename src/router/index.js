@@ -96,9 +96,9 @@ export const constantRoutes = [
         meta: { title: '商品详情', icon: 'form' }
       },
       {
-        path: 'index',
+        path: 'insert',
         name: 'Form',
-        component: () => import('@/views/product/list'),
+        component: () => import('@/views/product/info'),
         meta: { title: '新增商品', icon: 'form' }
       }
     ]
