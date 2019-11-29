@@ -36,7 +36,7 @@
           <span>{{scope.row.sales}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态">
+      <el-table-column label="状态" width="100">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -54,6 +54,7 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
+          <el-button type="danger" size="mini" @click="showDiscuss(scope.row.id)">查看评论</el-button>
           <el-button type="primary" size="mini" @click="edit(scope.row)">编辑</el-button>
           <el-button type="danger" size="mini" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
@@ -139,6 +140,9 @@ export default {
       updateProduct(obj).then(_ => {
         this.fetchData();
       });
+    },
+    showDiscuss(id) {
+      this.$router.push({name: 'discuss',query: {id: id}})
     },
     deleteHandle(id) {
       this.$confirm("此操作将永久删除此商品, 是否继续?", "提示", {

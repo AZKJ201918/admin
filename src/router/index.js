@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import store from '@/store'
 
 Vue.use(Router)
 
@@ -51,7 +52,7 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: '面板', icon: 'dashboard' }
+      meta: { title: '面板', role: ['root', 'admin'], icon: 'dashboard' }
     }]
   },
 
@@ -59,7 +60,7 @@ export const constantRoutes = [
     path: '/home',
     component: Layout,
     redirect: '/home/banners',
-    meta: { title: '首页设置', icon: 'example' },
+    meta: { title: '首页设置', role: ['root', 'admin'], icon: 'example' },
     children: [
       {
         path: 'banners',
@@ -80,7 +81,7 @@ export const constantRoutes = [
     path: '/product',
     component: Layout,
     redirect: '/product/list',
-    meta: { title: '商品管理', icon: 'form' },
+    meta: { title: '商品管理', role: ['root', 'admin'], icon: 'form' },
     children: [
       {
         path: 'list',
@@ -108,6 +109,7 @@ export const constantRoutes = [
     path: '/order',
     component: Layout,
     redirect: '/order/index',
+    meta: { role: ['root', 'admin', 'orders'] },
     children: [{
       path: 'index',
       name: 'order',
@@ -120,6 +122,7 @@ export const constantRoutes = [
     path: '/news',
     component: Layout,
     redirect: '/news/list',
+    meta: { role: ['root', 'admin'] },
     children: [{
       path: 'list',
       name: 'news',
@@ -132,6 +135,7 @@ export const constantRoutes = [
     path: '/videos',
     component: Layout,
     redirect: '/videos/list',
+    meta: { role: ['root', 'admin'] },
     children: [{
       path: 'list',
       name: 'videos',
@@ -144,6 +148,7 @@ export const constantRoutes = [
     path: '/retail',
     component: Layout,
     redirect: '/retail/index',
+    meta: { role: ['root', 'admin'] },
     children: [{
       path: 'index',
       name: 'retail',
@@ -151,11 +156,24 @@ export const constantRoutes = [
       meta: { title: '营销配置', icon: 'form' }
     }]
   },
-
+  {
+    path: '/discuss',
+    component: Layout,
+    redirect: '/discuss/index',
+    meta: { role: ['root'] },
+    hidden: true,
+    children: [{
+      path: 'index',
+      name: 'discuss',
+      component: () => import('@/views/discuss/list'),
+      meta: { title: '评论管理', icon: 'form' }
+    }]
+  },
   {
     path: '/user',
     component: Layout,
     redirect: '/user/index',
+    meta: { role: ['root'] },
     children: [{
       path: 'index',
       name: 'user',
@@ -168,11 +186,56 @@ export const constantRoutes = [
   { path: '*', redirect: '/404', hidden: true }
 ]
 
-const createRouter = () => new Router({
-  // mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
-  routes: constantRoutes
-})
+const createRouter = () => {
+  let routes = null
+  if (store) {
+    routes = []
+    const role = store.getters.role
+    console.log(role)
+    for (const route of constantRoutes) {
+      let ready = true
+      if ('meta' in route) {
+        if ('role' in route.meta) {
+          if (!route.meta.role.includes(role)) {
+            ready = false
+          }
+        }
+      }
+      if (ready && 'children' in route) {
+        // 先将子组件清空
+        const childrens = []
+        const originalChildren = route.children
+        route.children = childrens
+        console.log(originalChildren)
+        for (const children of originalChildren) {
+          let childrenReady = true
+          if ('meta' in children) {
+            if ('role' in children.meta) {
+              if (!children.meta.role.includes(role)) {
+                childrenReady = false
+              }
+            }
+          }
+          if (childrenReady) {
+            // 插入childrens
+            childrens.push(children)
+          }
+        }
+        // 遍历后将符合权限的子组件替换回来
+        route.children = childrens
+      }
+      if (ready) {
+        // 将符合权限的组件插入路由表中
+        routes.push(route)
+      }
+    }
+  }
+  return new Router({
+    // mode: 'history', // require service support
+    scrollBehavior: () => ({ y: 0 }),
+    routes: constantRoutes
+  })
+}
 
 const router = createRouter()
 

@@ -25,12 +25,12 @@
       </el-table-column>
     </el-table>
     <el-dialog :visible.sync="dialogVisible">
-      <el-form ref="form" :model="currentRow" label-width="80px">
-        <el-form-item label="账户名">
+      <el-form ref="form" :model="currentRow" :rules="rules" label-width="80px">
+        <el-form-item label="账户名" prop="name">
           <el-input v-model="currentRow.name"></el-input>
         </el-form-item>
-        <el-form-item label="密码">
-          <el-input v-model="currentRow.password"></el-input>
+        <el-form-item label="新密码">
+          <el-input type="password" v-model="currentRow.password"></el-input>
         </el-form-item>
         <el-form-item label="角色">
           <el-select v-model="currentRow.rid" placeholder="请选择">
@@ -62,12 +62,33 @@ import {
 } from "@/api/user";
 export default {
   data() {
+    const validateName = async (rule, value, callback) => {
+      if (!value) {
+        callback(new Error("不能为空"));
+      } else {
+        if (this.originalName != value) {
+          await userExsits(value).then(({ data }) => {
+            if (data) {
+              callback(new Error("用户名重复"));
+            } else {
+              callback();
+            }
+          });
+        } else {
+          callback();
+        }
+      }
+    };
     return {
       userTable: null,
       loading: false,
       dialogVisible: false,
       currentRow: {},
-      roleArray: []
+      roleArray: [],
+      rules: {
+        name: [{ validator: validateName, trigger: "blur" }]
+      },
+      originalName: ""
     };
   },
   created() {
@@ -89,7 +110,9 @@ export default {
     },
     showEidt(row) {
       this.dialogVisible = true;
+      row.password = "";
       this.currentRow = row;
+      this.originalName = row.name;
       this.rid = "";
     },
     showCreate() {
@@ -102,25 +125,29 @@ export default {
       };
     },
     save() {
-      if ("id" in this.currentRow) {
-        updateUser(this.currentRow).then(_ => {
-          this.$message({
-            type: "success",
-            message: "保存成功!"
-          });
-          this.dialogVisible = false;
-          this.fetchData();
-        });
-      } else {
-        insertUser(this.currentRow).then(_ => {
-          this.$message({
-            type: "success",
-            message: "保存成功!"
-          });
-          this.dialogVisible = false;
-          this.fetchData();
-        });
-      }
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          if ("id" in this.currentRow) {
+            updateUser(this.currentRow).then(_ => {
+              this.$message({
+                type: "success",
+                message: "保存成功!"
+              });
+              this.dialogVisible = false;
+              this.fetchData();
+            });
+          } else {
+            insertUser(this.currentRow).then(_ => {
+              this.$message({
+                type: "success",
+                message: "保存成功!"
+              });
+              this.dialogVisible = false;
+              this.fetchData();
+            });
+          }
+        }
+      });
     },
     showDelete(row) {
       this.$confirm("此操作将永久删除此用户, 是否继续?", "提示", {
@@ -129,7 +156,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          deleteUser({id: row.id, uid: row.uid}).then(() => {
+          deleteUser({ id: row.id, uid: row.uid }).then(() => {
             this.$message({
               type: "success",
               message: "删除成功!"

@@ -97,6 +97,7 @@
  */
 import draggable from "vuedraggable";
 import { getToken } from "@/utils/auth";
+import { baseURL } from "@/utils/request";
 export default {
   name: "ComImageShow",
   components: {
@@ -116,7 +117,7 @@ export default {
     },
     action: {
       type: Function,
-      default: () => "http://192.168.0.141:777/slideShowImg"
+      default: () => baseURL + "/slideShowImg"
     },
     beforeUpload: {
       type: Function,
@@ -131,7 +132,7 @@ export default {
     return {
       banner_list: [], //拖拽插件不建议直接改变父组件的传值，所以另建一个新数组
       file_list: [], //保存开启拖拽之前排序的数组
-      drag_open: false //拖拽开启开关
+      drag_open: false, //拖拽开启开关
     };
   },
   methods: {

@@ -21,7 +21,9 @@
         <el-input v-model="searchObj.orderid" placeholder="订单号"></el-input>
       </el-form-item>
       <el-button size="mini" @click="fetchData">搜索</el-button>
+      <el-button size="mini" @click="exportOrder">导出待发货订单</el-button>
     </el-form>
+
     <el-table ref="table" :data="orderTable" style="width: 100%" v-loading="loading" border>
       <el-table-column type="expand">
         <template slot-scope="scope">
@@ -92,7 +94,8 @@
 </template>
 
 <script>
-import { getAllOrder, updateOrder } from "@/api/order";
+import { getAllOrder, updateOrder, importOrderUrl } from "@/api/order";
+
 export default {
   data() {
     return {
@@ -183,6 +186,9 @@ export default {
       this.showSendForm = true;
       this.sendForm.id = row.id;
       this.sendForm.orderid = row.orderid;
+    },
+    exportOrder() {
+      window.open(importOrderUrl);
     },
     fetchData() {
       this.loading = true;

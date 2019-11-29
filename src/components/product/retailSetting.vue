@@ -17,14 +17,14 @@
             <el-radio v-model="rRetailTable.parenttype" :label="1">固定金额</el-radio>
           </el-form-item>
           <el-form-item :label="rRetailTable.parenttype === 0? '第一级分销比例':'第一级分销金额' " prop="parent">
-            <el-input v-model.number="rRetailTable.parent"></el-input>
+            <el-input v-model="rRetailTable.parent"></el-input>
           </el-form-item>
           <el-form-item label="第二级分销模式">
             <el-radio v-model="rRetailTable.grandtype" :label="0">比例分销</el-radio>
             <el-radio v-model="rRetailTable.grandtype" :label="1">固定金额</el-radio>
           </el-form-item>
           <el-form-item :label="rRetailTable.grandtype === 0? '第二级分销比例':'第一级分销金额'" prop="grand">
-            <el-input v-model.number="rRetailTable.grand"></el-input>
+            <el-input v-model="rRetailTable.grand"></el-input>
           </el-form-item>
           <div style="font-size: 14px;color: #606266;">
             独立分销结束时间
@@ -41,10 +41,12 @@ export default {
   props: ["retail", "retailTable", "ready"],
   data() {
     const validateParent = (rule, value, callback) => {
-      if (!Number.isInteger(value)) {
-        callback(new Error("请输入数字值"));
+      let reg = /^\d+$|^\d*\.\d+$/g;
+
+      if (!reg.test(value)) {
+        callback(new Error("请输入数字"));
       } else {
-        if (this.retailTable.parenttype === 0 && value > 1) {
+        if (this.retailTable.parenttype == 0 && value > 1) {
           callback(new Error("不能超过1"));
         } else {
           callback();
@@ -52,10 +54,12 @@ export default {
       }
     };
     const validateGrand = (rule, value, callback) => {
-      if (!Number.isInteger(value)) {
-        callback(new Error("请输入数字值"));
+      let reg = /^\d+$|^\d*\.\d+$/g;
+
+      if (!reg.test(value)) {
+        callback(new Error("请输入数字"));
       } else {
-        if (this.retailTable.grandtype === 0 && value > 1) {
+        if (this.retailTable.grandtype == 0 && value > 1) {
           callback(new Error("不能超过1"));
         } else {
           callback();

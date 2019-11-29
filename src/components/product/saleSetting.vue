@@ -94,7 +94,8 @@ export default {
   data() {
     return {
       checked: [false, false, false, false, false],
-      time: null
+      time: null,
+      full: true
     };
   },
   watch: {

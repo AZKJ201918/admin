@@ -1,6 +1,7 @@
 import testRequest from '@/utils/testRequest'
 import request from '@/utils/request'
-
+import { baseURL } from '@/utils/request'
+export const importOrderUrl = baseURL + 'importOrder'
 /**
  * 查看商品
  */
