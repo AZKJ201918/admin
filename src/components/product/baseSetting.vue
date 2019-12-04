@@ -12,6 +12,15 @@
     <el-form-item label="商品原价">
       <el-input v-model="value.price"></el-input>
     </el-form-item>
+    <el-form-item label="限购选项">
+      <div class="integral">
+        <el-checkbox v-model="isLimit">开启限购</el-checkbox>
+        <div v-if="isLimit" style="display: flex">
+          <div style="width: 110px">每个id限购份数</div>
+          <el-input v-model.number="value.buy"></el-input>
+        </div>
+      </div>
+    </el-form-item>
     <el-form-item label="积分选项">
       <div class="integral">
         <el-checkbox v-model="value.isintegral">此商品为积分商品</el-checkbox>
@@ -43,8 +52,12 @@ export default {
     return {
       rUrl: this.url,
       rBanner: this.banner,
-      rIntegral: this.integral
+      rIntegral: this.integral,
+      isLimit: false
     };
+  },
+  created() {
+    this.isLimit = !!this.value.buy;
   },
   watch: {
     rUrl: {
@@ -61,6 +74,9 @@ export default {
     },
     rIntegral(val) {
       this.$emit("update:integral", val);
+    },
+    isLimit() {
+      this.value.num = null;
     }
   }
 };

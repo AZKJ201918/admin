@@ -119,7 +119,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          deleteNew({id: row.id, uid: row.uid}).then(() => {
+          deleteNew(row.id).then(() => {
             this.$message({
               type: "success",
               message: "删除成功!"

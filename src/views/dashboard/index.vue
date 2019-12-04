@@ -90,10 +90,7 @@ export default {
       this.chartData[name].yData.push(yData);
     },
     dateFomate(click_date) {
-      console.log(click_date);
       const date = new Date(click_date);
-      console.log(date.getTime());
-      console.log(date);
       let dateStr =
         date.getFullYear() +
         "年" +

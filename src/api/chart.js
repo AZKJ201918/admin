@@ -1,5 +1,5 @@
-import request from '@/utils/testRequest'
-// import request from '@/utils/request'
+// import request from '@/utils/testRequest'
+import request from '@/utils/request'
 
 /**
  * 获取销售额

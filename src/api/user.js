@@ -1,7 +1,6 @@
 import request from '@/utils/request'
-import testRequest from '@/utils/testRequest'
 export function login(data) {
-  return testRequest({
+  return request({
     url: '/login',
     method: 'post',
     data
@@ -9,7 +8,7 @@ export function login(data) {
 }
 
 export function getInfo(token) {
-  return testRequest({
+  return request({
     url: '/role',
     method: 'post',
     params: { token }
@@ -18,13 +17,13 @@ export function getInfo(token) {
 
 export function logout() {
   return request({
-    url: '/user/logout',
-    method: 'post'
+    url: '/exit',
+    method: 'get'
   })
 }
 
 export function getAllUser(name, page) {
-  return testRequest({
+  return request({
     url: '/loadUser',
     method: 'post',
     params: {
@@ -34,7 +33,7 @@ export function getAllUser(name, page) {
 }
 
 export function insertUser(data) {
-  return testRequest({
+  return request({
     url: '/insertUser',
     method: 'post',
     params: data
@@ -42,7 +41,7 @@ export function insertUser(data) {
 }
 
 export function updateUser(data) {
-  return testRequest({
+  return request({
     url: '/updateUser',
     method: 'post',
     params: data
@@ -50,7 +49,7 @@ export function updateUser(data) {
 }
 
 export function userExsits(name) {
-  return testRequest({
+  return request({
     url: '/userExsits',
     method: 'post',
     params: {
@@ -60,7 +59,7 @@ export function userExsits(name) {
 }
 
 export function deleteUser(data) {
-  return testRequest({
+  return request({
     url: '/deleteUser',
     method: 'post',
     params: data
@@ -68,7 +67,7 @@ export function deleteUser(data) {
 }
 
 export function getAllRole(id) {
-  return testRequest({
+  return request({
     url: '/allRole',
     method: 'post',
     params: {

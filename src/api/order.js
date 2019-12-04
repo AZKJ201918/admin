@@ -1,4 +1,4 @@
-import testRequest from '@/utils/testRequest'
+// import testRequest from '@/utils/testRequest'
 import request from '@/utils/request'
 import { baseURL } from '@/utils/request'
 export const importOrderUrl = baseURL + 'importOrder'
@@ -6,7 +6,7 @@ export const importOrderUrl = baseURL + 'importOrder'
  * 查看商品
  */
 export function getAllOrder(data, page, limit) {
-  return testRequest({
+  return request({
     url: '/allOrder',
     method: 'post',
     data,
@@ -21,7 +21,7 @@ export function getAllOrder(data, page, limit) {
  * 查看商品
  */
 export function updateOrder(data) {
-  return testRequest({
+  return request({
     url: '/updateOrder',
     method: 'post',
     data

@@ -1,5 +1,5 @@
 <template>
-  <dir class="app-container">
+  <dir class="app-container" v-loading="loading">
     <div class="banner-container">
       <h3>效果预览：</h3>
       <el-carousel
@@ -34,6 +34,7 @@
               class="upload"
               ref="upload"
               action="http://192.168.0.141:777/slideShowImg"
+              :headers="{'X-token': getToken()}"
               :file-list="fileList"
               :limit="1"
               :on-exceed="handleExceed"
@@ -146,6 +147,8 @@
 </template>
 
 <script>
+import { getToken } from "@/utils/auth";
+
 import {
   getBanners,
   getInternalLink,
@@ -157,6 +160,7 @@ import { getProductByNameLike } from "@/api/product";
 export default {
   data() {
     return {
+      loading: false,
       bannerList: [{}],
       banner: null,
       fileList: [],
@@ -201,6 +205,7 @@ export default {
     });
   },
   methods: {
+    getToken,
     /**
      * 上传图片
      */
@@ -261,6 +266,7 @@ export default {
      * 重置表单
      */
     reloadForm(data, index) {
+      this.fileList = [];
       this.bannerList = data;
       this.options.linkType.value = data[index || 0].linktype;
       this.options.priority.value = data[index || 0].sort;
@@ -273,7 +279,7 @@ export default {
     newForm() {
       this.options.linkType.value = 0;
       this.options.priority.value = this.bannerList.length + 1;
-      if(!this.options.priority.array.includes(this.bannerList.length + 1)) {
+      if (!this.options.priority.array.includes(this.bannerList.length + 1)) {
         this.options.priority.array.push(this.bannerList.length + 1);
       }
       this.options.miniProgram.value = null;
@@ -288,26 +294,30 @@ export default {
     deleteBanner() {
       deleteBanner(this.banner.id).then(() => {
         this.$message({
-            message: "成功",
-            type: "success",
-            onClose: () => {
-              location.reload();
-            }
-          });
+          message: "成功",
+          type: "success"
+        });
+        this.reloadBanners();
       });
     },
     /**
      * 刷新轮播图内容
      */
     reloadBanners() {
-      getBanners(1).then(({ data }) => {
-        this.reloadForm(data.list);
-        const priorityArray = [];
-        for (let i = 0; i < data.list.length; i++) {
-          priorityArray.push(i + 1);
-        }
-        this.options.priority.array = priorityArray;
-      });
+      this.loading = true;
+
+      getBanners(1)
+        .then(({ data }) => {
+          this.reloadForm(data.list);
+          const priorityArray = [];
+          for (let i = 0; i < data.list.length; i++) {
+            priorityArray.push(i + 1);
+          }
+          this.options.priority.array = priorityArray;
+        })
+        .finally(_ => {
+          this.loading = false;
+        });
     },
     /**
      * 文件选择超限的提示
@@ -327,7 +337,7 @@ export default {
       this.banner.sort = this.options.priority.value;
       if (this.banner.id) {
         updateBanner(this.banner).then(({ data }) => {
-          location.reload();
+          this.reloadBanners();
           this.$message({
             message: "成功",
             type: "success"
@@ -335,7 +345,7 @@ export default {
         });
       } else {
         insertBanner(this.banner).then(({ data }) => {
-          location.reload();
+          this.reloadBanners();
           this.$message({
             message: "成功",
             type: "success"

@@ -34,6 +34,7 @@
               class="upload"
               ref="upload"
               action="http://192.168.0.141:777/slideShowImg"
+              :headers="{'X-token': getToken()}"
               :file-list="fileList"
               :limit="1"
               :on-exceed="handleExceed"
@@ -71,7 +72,7 @@
             >
               <i class="el-icon-question" slot="reference"></i>
             </el-popover>
-          </el-form-item> -->
+          </el-form-item>-->
           <el-form-item label="按钮名称">
             <el-input v-model="button.name" placeholder="请输入按钮名称"></el-input>
           </el-form-item>
@@ -149,6 +150,7 @@
 </template>
 
 <script>
+import { getToken } from "@/utils/auth";
 import {
   getAllButtons,
   getInternalLink,
@@ -204,6 +206,7 @@ export default {
     });
   },
   methods: {
+    getToken,
     /**
      * 上传图片
      */
@@ -264,7 +267,7 @@ export default {
      * 重置表单
      */
     reloadForm(data, index) {
-      console.log(data);
+      this.fileList = [];
       this.buttonList = data;
       this.options.linkType.value = data[index || 0].linktype;
       this.options.priority.value = data[index || 0].sort;
@@ -331,7 +334,7 @@ export default {
       this.button.sort = this.options.priority.value;
       if (this.button.id) {
         updateButton(this.button).then(({ data }) => {
-          location.reload();
+          this.reloadButtons();
           this.$message({
             message: "成功",
             type: "success"
@@ -339,7 +342,7 @@ export default {
         });
       } else {
         insertButton(this.button).then(({ data }) => {
-          location.reload();
+          this.reloadButtons();
           this.$message({
             message: "成功",
             type: "success"

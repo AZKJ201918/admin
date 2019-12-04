@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import store from '@/store'
 
 Vue.use(Router)
 
@@ -31,31 +30,8 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
-export const constantRoutes = [
-  {
-    path: '/login',
-    component: () => import('@/views/login/index'),
-    hidden: true
-  },
 
-  {
-    path: '/404',
-    component: () => import('@/views/404'),
-    hidden: true
-  },
-
-  {
-    path: '/',
-    component: Layout,
-    redirect: '/dashboard',
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: '面板', role: ['root', 'admin'], icon: 'dashboard' }
-    }]
-  },
-
+export const asyncRoutes = [
   {
     path: '/home',
     component: Layout,
@@ -180,6 +156,32 @@ export const constantRoutes = [
       component: () => import('@/views/user/index'),
       meta: { title: '账号设置', icon: 'form' }
     }]
+  }
+]
+
+export const constantRoutes = [
+  {
+    path: '/login',
+    component: () => import('@/views/login/index'),
+    hidden: true
+  },
+
+  {
+    path: '/404',
+    component: () => import('@/views/404'),
+    hidden: true
+  },
+
+  {
+    path: '/',
+    component: Layout,
+    redirect: '/dashboard',
+    children: [{
+      path: 'dashboard',
+      name: 'Dashboard',
+      component: () => import('@/views/dashboard/index'),
+      meta: { title: '面板', icon: 'dashboard' }
+    }]
   },
 
   // 404 page must be placed at the end !!!
@@ -187,51 +189,8 @@ export const constantRoutes = [
 ]
 
 const createRouter = () => {
-  let routes = null
-  if (store) {
-    routes = []
-    const role = store.getters.role
-    console.log(role)
-    for (const route of constantRoutes) {
-      let ready = true
-      if ('meta' in route) {
-        if ('role' in route.meta) {
-          if (!route.meta.role.includes(role)) {
-            ready = false
-          }
-        }
-      }
-      if (ready && 'children' in route) {
-        // 先将子组件清空
-        const childrens = []
-        const originalChildren = route.children
-        route.children = childrens
-        console.log(originalChildren)
-        for (const children of originalChildren) {
-          let childrenReady = true
-          if ('meta' in children) {
-            if ('role' in children.meta) {
-              if (!children.meta.role.includes(role)) {
-                childrenReady = false
-              }
-            }
-          }
-          if (childrenReady) {
-            // 插入childrens
-            childrens.push(children)
-          }
-        }
-        // 遍历后将符合权限的子组件替换回来
-        route.children = childrens
-      }
-      if (ready) {
-        // 将符合权限的组件插入路由表中
-        routes.push(route)
-      }
-    }
-  }
   return new Router({
-    // mode: 'history', // require service support
+    mode: 'hash',
     scrollBehavior: () => ({ y: 0 }),
     routes: constantRoutes
   })
@@ -239,10 +198,9 @@ const createRouter = () => {
 
 const router = createRouter()
 
-// Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
   const newRouter = createRouter()
-  router.matcher = newRouter.matcher // reset router
+  router.matcher = newRouter.matcher
 }
 
 export default router

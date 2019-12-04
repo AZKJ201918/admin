@@ -40,14 +40,14 @@
       <el-card class="card-box" ref="detail">
         <el-form ref="form" :model="currentProduct" label-width="80px">
           <el-form-item label="商品详情">
-            <drawable-upload :limit="3" :list.sync="uploadList.detail"></drawable-upload>
+            <drawable-upload :limit="20" :list.sync="uploadList.detail"></drawable-upload>
           </el-form-item>
           <el-form-item label="规格详情">
-            <drawable-upload :limit="3" :list.sync="uploadList.specs"></drawable-upload>
+            <drawable-upload :limit="20" :list.sync="uploadList.specs"></drawable-upload>
           </el-form-item>
 
           <el-form-item label="售后详情">
-            <drawable-upload :limit="3" :list.sync="uploadList.sale"></drawable-upload>
+            <drawable-upload :limit="20" :list.sync="uploadList.sale"></drawable-upload>
           </el-form-item>
         </el-form>
       </el-card>
@@ -102,6 +102,7 @@ function createProductObj(cid) {
       starttime: new Date(),
       subtract: null
     },
+    num: null,
     deatilBannerList: [],
     detailurl: "[]",
     isintegral: false,
