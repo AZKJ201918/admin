@@ -156,6 +156,18 @@ export const asyncRoutes = [
       component: () => import('@/views/user/index'),
       meta: { title: '账号设置', icon: 'form' }
     }]
+  },
+  {
+    path: '/apply',
+    component: Layout,
+    redirect: '/apply/index',
+    meta: { role: ['root'] },
+    children: [{
+      path: 'index',
+      name: 'apply',
+      component: () => import('@/views/apply/index'),
+      meta: { title: '提现申请', icon: 'form' }
+    }]
   }
 ]
 
@@ -185,12 +197,13 @@ export const constantRoutes = [
   },
 
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  // { path: '*', redirect: '/404', hidden: true }
 ]
 
 const createRouter = () => {
   return new Router({
     mode: 'hash',
+    base: '/nuojiasystem/admin/',
     scrollBehavior: () => ({ y: 0 }),
     routes: constantRoutes
   })

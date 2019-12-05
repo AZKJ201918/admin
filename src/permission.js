@@ -84,7 +84,7 @@ router.beforeEach(async (to, from, next) => {
           const routes = constantRoutes.concat(createRoutes())
           store.commit('app/SET_ROUTES', routes)
           router.addRoutes(routes)
-          next({ ...to, replace: true })
+          next({ ...to})
         } catch (error) {
           // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')
