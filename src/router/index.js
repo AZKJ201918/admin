@@ -136,7 +136,7 @@ export const asyncRoutes = [
     path: '/discuss',
     component: Layout,
     redirect: '/discuss/index',
-    meta: { role: ['root'] },
+    meta: { role: ['root', 'admin'] },
     hidden: true,
     children: [{
       path: 'index',
@@ -149,7 +149,7 @@ export const asyncRoutes = [
     path: '/user',
     component: Layout,
     redirect: '/user/index',
-    meta: { role: ['root'] },
+    meta: { role: ['root', 'admin'] },
     children: [{
       path: 'index',
       name: 'user',
@@ -158,15 +158,39 @@ export const asyncRoutes = [
     }]
   },
   {
+    path: '/wxuser',
+    component: Layout,
+    redirect: '/wxuser/index',
+    meta: { role: ['root', 'admin'] },
+    children: [{
+      path: 'index',
+      name: 'wxuser',
+      component: () => import('@/views/wxuser/index'),
+      meta: { title: '用户管理', icon: 'form' }
+    }]
+  },
+  {
     path: '/apply',
     component: Layout,
     redirect: '/apply/index',
-    meta: { role: ['root'] },
+    meta: { role: ['root', 'admin'] },
     children: [{
       path: 'index',
       name: 'apply',
       component: () => import('@/views/apply/index'),
       meta: { title: '提现申请', icon: 'form' }
+    }]
+  },
+  {
+    path: '/upload',
+    component: Layout,
+    redirect: '/upload/index',
+    meta: { role: ['root', 'admin'] },
+    children: [{
+      path: 'index',
+      name: 'apply',
+      component: () => import('@/views/upload/index'),
+      meta: { title: 'cdn加速', icon: 'form' }
     }]
   }
 ]

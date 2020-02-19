@@ -80,7 +80,7 @@ export default {
     fetchData() {
       for (let i = 0; i < 3; i++) {
         this.tabs[i].tableLoading = true;
-        getDiscuss(this.tabs[i].currentPage, this.id, i + 1)
+        getDiscuss(this.id, this.tabs[i].currentPage, i + 1)
           .then(({ data }) => {
             this.tabs[i].tableData = data.discusses;
             this.tabs[i].count = data.count;

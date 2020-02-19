@@ -33,7 +33,7 @@
             <el-upload
               class="upload"
               ref="upload"
-              action="http://192.168.0.141:777/slideShowImg"
+              :action="baseURL+'/slideShowImg'"
               :headers="{'X-token': getToken()}"
               :file-list="fileList"
               :limit="1"
@@ -49,7 +49,7 @@
                 type="success"
                 @click="submitUploadFile"
               >上传到服务器</el-button>
-              <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb,注意尺寸为375*200</div>
+              <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb,注意尺寸为100*100</div>
             </el-upload>
           </el-form-item>
         </el-form>
@@ -151,6 +151,7 @@
 
 <script>
 import { getToken } from "@/utils/auth";
+import { baseURL } from "@/utils/request";
 import {
   getAllButtons,
   getInternalLink,
@@ -162,6 +163,7 @@ import { getProductByNameLike } from "@/api/product";
 export default {
   data() {
     return {
+      baseURL,
       buttonList: null,
       button: null,
       fileList: [],

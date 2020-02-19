@@ -22,9 +22,22 @@ export function getCashRequest(status, page, limit) {
 export function disposeCashRequest(uuid) {
   return request({
     url: "/tiCash",
-    method: "get",
+    method: "post",
     params: {
       uuid
+    }
+  });
+}
+
+/**
+ * 修改提现申请
+ */
+export function updateRemark(id, remark) {
+  return request({
+    url: "/modifyRemark",
+    method: "post",
+    params: {
+      id, remark
     }
   });
 }

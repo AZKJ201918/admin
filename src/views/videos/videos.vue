@@ -23,7 +23,7 @@
         <video :src="currentVideo.videourl" controls />
         <el-input v-model="currentVideo.videourl"></el-input>
         <el-upload
-          action="http://192.168.0.141:777/uploadVideo"
+          :action="baseURL+'/uploadVideo'"
           :limit="1"
           :on-success="handleChange"
           :headers="{'X-token': getToken()}"
@@ -42,6 +42,7 @@
 
 <script>
 import { getToken } from "@/utils/auth";
+import { baseURL } from "@/utils/request";
 
 import {
   getAllVideo,
@@ -52,6 +53,7 @@ import {
 export default {
   data() {
     return {
+      baseURL,
       tableData: [],
       currentVideo: {},
       tableLoading: false,

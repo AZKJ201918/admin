@@ -1,7 +1,7 @@
 // import testRequest from '@/utils/testRequest'
 import request from '@/utils/request'
 import { baseURL } from '@/utils/request'
-export const importOrderUrl = baseURL + 'importOrder'
+export const importOrderUrl = baseURL + '/importOrder'
 /**
  * 查看商品
  */
@@ -27,3 +27,18 @@ export function updateOrder(data) {
     data
   })
 }
+
+
+/**
+ * 修改订单备注
+ */
+export function updateRemark(id, remark) {
+  return request({
+    url: '/modifyOrder',
+    method: 'post',
+    params: {
+      id, remark
+    }
+  })
+}
+

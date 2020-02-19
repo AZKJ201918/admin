@@ -1,77 +1,78 @@
-import request from '@/utils/request'
+import request from "@/utils/request";
 export function login(data) {
   return request({
-    url: '/login',
-    method: 'post',
+    url: "/login",
+    method: "post",
     data
-  })
+  });
 }
 
 export function getInfo(token) {
   return request({
-    url: '/role',
-    method: 'post',
+    url: "/role",
+    method: "post",
     params: { token }
-  })
+  });
 }
 
 export function logout() {
   return request({
-    url: '/exit',
-    method: 'get'
-  })
+    url: "/exit",
+    method: "get"
+  });
 }
 
-export function getAllUser(name, page) {
+export function getAllUser(page) {
   return request({
-    url: '/loadUser',
-    method: 'post',
+    url: "/loadUser",
+    method: "post",
     params: {
-      name, page: page || 1, limit: 8
+      page: page || 1,
+      limit: 20
     }
-  })
+  });
 }
 
 export function insertUser(data) {
   return request({
-    url: '/insertUser',
-    method: 'post',
+    url: "/insertUser",
+    method: "post",
     params: data
-  })
+  });
 }
 
 export function updateUser(data) {
   return request({
-    url: '/updateUser',
-    method: 'post',
+    url: "/updateUser",
+    method: "post",
     params: data
-  })
+  });
 }
 
 export function userExsits(name) {
   return request({
-    url: '/userExsits',
-    method: 'post',
+    url: "/userExsits",
+    method: "post",
     params: {
       name: name
     }
-  })
+  });
 }
 
 export function deleteUser(data) {
   return request({
-    url: '/deleteUser',
-    method: 'post',
+    url: "/deleteUser",
+    method: "post",
     params: data
-  })
+  });
 }
 
 export function getAllRole(id) {
   return request({
-    url: '/allRole',
-    method: 'post',
+    url: "/allRole",
+    method: "post",
     params: {
       name: id
     }
-  })
+  });
 }

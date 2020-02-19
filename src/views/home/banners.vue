@@ -33,7 +33,7 @@
             <el-upload
               class="upload"
               ref="upload"
-              action="http://192.168.0.141:777/slideShowImg"
+              :action="baseURL+'/slideShowImg'"
               :headers="{'X-token': getToken()}"
               :file-list="fileList"
               :limit="1"
@@ -148,7 +148,7 @@
 
 <script>
 import { getToken } from "@/utils/auth";
-
+import { baseURL } from "@/utils/request";
 import {
   getBanners,
   getInternalLink,
@@ -160,6 +160,7 @@ import { getProductByNameLike } from "@/api/product";
 export default {
   data() {
     return {
+      baseURL,
       loading: false,
       bannerList: [{}],
       banner: null,

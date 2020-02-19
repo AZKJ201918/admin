@@ -61,9 +61,11 @@
           <span>{{scope.row.status | status}}</span>
         </template>
       </el-table-column>
+      <el-table-column prop="remark" label="备注" align="center"></el-table-column>
       <el-table-column label="操作" width="160" align="center">
         <template slot-scope="scope">
           <el-button v-if="scope.row.status === 2" @click="deliver(scope.row)">发货</el-button>
+          <el-button @click="modifyRemark(scope.row)">修改备注</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -90,11 +92,27 @@
         <el-button type="primary" @click="save">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog title="备注" :visible.sync="dialogVisible">
+      <el-form ref="form" label-width="80px">
+        <el-input v-model="remark"></el-input>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveRemark">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getAllOrder, updateOrder, importOrderUrl } from "@/api/order";
+import { getToken } from "@/utils/auth";
+import axios from "axios";
+import {
+  getAllOrder,
+  updateOrder,
+  importOrderUrl,
+  updateRemark
+} from "@/api/order";
 
 export default {
   data() {
@@ -123,6 +141,9 @@ export default {
       totalPage: 0,
       showSendForm: false,
       sendForm: { company: "", courier: "" },
+      dialogVisible: false,
+      remark: "",
+      currentId: 0,
       pickerOptions: {
         shortcuts: [
           {
@@ -188,7 +209,27 @@ export default {
       this.sendForm.orderid = row.orderid;
     },
     exportOrder() {
-      window.open(importOrderUrl);
+      axios({
+        method: "get",
+        headers: {"X-token" : getToken()},
+        url: importOrderUrl, // 请求地址
+        responseType: "blob" // 表明返回服务器返回的数据类型
+      }).then(response => {
+          let blob = new Blob([response.data], {
+            type: "application/vnd.ms-excel"
+          });
+          let fileName = Date.parse(new Date()) + ".xlsx";
+          if (window.navigator.msSaveOrOpenBlob) {
+            navigator.msSaveBlÎob(blob, fileName);
+          } else {
+            var link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = fileName;
+            link.click();
+            window.URL.revokeObjectURL(link.href);
+          }
+        }
+      );
     },
     fetchData() {
       this.loading = true;
@@ -211,6 +252,23 @@ export default {
         });
         this.fetchData();
         this.showSendForm = false;
+      });
+    },
+    /**
+     * 修改备注
+     */
+    modifyRemark({ id, remark }) {
+      this.remark = remark;
+      this.currentId = id;
+      this.dialogVisible = true;
+    },
+    /**
+     * 提交修改
+     */
+    saveRemark() {
+      updateRemark(this.currentId, this.remark).then(_ => {
+        this.dialogVisible = false;
+        this.fetchData();
       });
     }
   }
